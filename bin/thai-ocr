@@ -1,0 +1,11 @@
+#!/bin/sh
+# thai-ocr launcher. Resolves its own location even when called through a symlink
+# (e.g. /usr/local/bin/thai-ocr), then runs the venv python in isolated mode.
+SELF="$0"
+while [ -L "$SELF" ]; do
+  T="$(readlink "$SELF")"
+  case "$T" in /*) SELF="$T" ;; *) SELF="$(dirname "$SELF")/$T" ;; esac
+done
+H="${THAI_OCR_HOME:-$(cd "$(dirname "$SELF")/.." && pwd)}"
+export THAI_OCR_HOME="$H"
+exec "$H/venv/bin/python" -I "$H/thai_ocr.py" "$@"
